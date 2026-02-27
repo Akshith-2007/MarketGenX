@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="app-layout fade-in">
+  <div class="form-section glass-panel">
+    <h2><i class="fa-solid fa-scale-balanced text-accent"></i> Competitor Analysis</h2>
+    <p class="subtitle">Compare your product against competitors and get positioning advice.</p>
+
+    <form method="POST" action="/competitor">
+      <div class="form-group">
+        <label for="product">Your Product / Service</label>
+        <input type="text" id="product" name="product" placeholder="e.g. NextGen CRM" required>
+      </div>
+
+      <div class="form-group">
+        <label for="competitors">Competitors (comma-separated)</label>
+        <textarea id="competitors" name="competitors" rows="3" placeholder="e.g. Competitor A, Competitor B" required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="market">Target Market / Segment</label>
+        <input type="text" id="market" name="market" placeholder="e.g. SMB retail in US">
+      </div>
+
+      <div class="form-group">
+        <label for="features">Key features to compare (optional)</label>
+        <input type="text" id="features" name="features" placeholder="e.g. Pricing, integrations, support">
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100">Run Analysis</button>
+    </form>
+  </div>
+
+  <div class="result-section glass-panel">
+    <h3>Competitor Analysis</h3>
+    {% if result %}
+    <div class="result-content markdown-body">
+      {{ result | replace('\n', '<br>') | safe }}
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <i class="fa-solid fa-chart-pie"></i>
+      <p>Enter details to get a structured competitor analysis.</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

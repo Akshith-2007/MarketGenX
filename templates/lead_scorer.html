@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="app-layout fade-in">
+    <div class="form-section glass-panel">
+        <h2><i class="fa-solid fa-user-check text-accent"></i> Lead Scorer</h2>
+        <p class="subtitle">Provide lead details and get a score plus follow-up priority.</p>
+
+        <form method="POST" action="/lead-scorer">
+            <div class="form-group">
+                <label for="name">Lead Name (optional)</label>
+                <input type="text" id="name" name="name" placeholder="e.g. John Doe">
+            </div>
+
+            <div class="form-group">
+                <label for="demographic">Demographic (age, location, role)</label>
+                <input type="text" id="demographic" name="demographic" placeholder="e.g. 30-45, NYC, Marketing Manager" required>
+            </div>
+
+            <div class="form-group">
+                <label for="behavior">Behavior (recent actions, content viewed)</label>
+                <textarea id="behavior" name="behavior" rows="3" placeholder="e.g. visited pricing page, downloaded whitepaper" required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="financial">Financial (budget, company size)</label>
+                <input type="text" id="financial" name="financial" placeholder="e.g. budget $10k, 50-200 employees">
+            </div>
+
+            <div class="form-group">
+                <label for="engagement">Engagement level</label>
+                <select id="engagement" name="engagement" required>
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="need_fit">Need / Problem Fit</label>
+                <select id="need_fit" name="need_fit" required>
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Score Lead</button>
+        </form>
+    </div>
+
+    <div class="result-section glass-panel">
+        <h3>Lead Score</h3>
+        {% if result %}
+        <div class="result-content markdown-body">
+            {{ result | replace('\n', '<br>') | safe }}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fa-solid fa-user-clock"></i>
+            <p>Enter lead details to get a score and recommended priority.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

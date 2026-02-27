@@ -1,0 +1,208 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="hero fade-in">
+    <h1>Automate your marketing with <span class="gradient-text">Generative AI</span></h1>
+    <p>Empower your team to market like pros. Get professional campaigns, pitches, posters, lead scoring, and competitor analysis in seconds.</p>
+    <div class="hero-buttons">
+        <button onclick="openInterestModal()" class="btn btn-primary">Get Started</button>
+    </div>
+</section>
+
+<!-- Interest Selection Modal -->
+<div id="interestModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1000; align-items: center; justify-content: center;">
+    <div style="background: white; border-radius: 12px; padding: 40px; max-width: 500px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);">
+        <h2 style="margin-top: 0; color: #333; text-align: center;">What would you like to do?</h2>
+        <p style="text-align: center; color: #666; margin-bottom: 30px;">Select an option to get started with MarketAI</p>
+        
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+            <button onclick="navigateTo('/campaign')" style="padding: 15px; background: linear-gradient(135deg, #ff6b6b, #ff5252); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: 500; text-align: left; display: flex; align-items: center; gap: 12px; transition: all 0.3s ease;" onmouseover="this.style.transform='translateX(5px)'; this.style.boxShadow='0 5px 15px rgba(255, 107, 107, 0.3)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
+                <i class="fa-solid fa-bullhorn" style="font-size: 18px;"></i>
+                <span>Create Marketing Campaign</span>
+            </button>
+            
+            <button onclick="navigateTo('/pitch')" style="padding: 15px; background: #f0f0f0; color: #333; border: none; border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: 500; text-align: left; display: flex; align-items: center; gap: 12px; transition: all 0.3s ease;" onmouseover="this.style.background='#e0e0e0'; this.style.transform='translateX(5px)'" onmouseout="this.style.background='#f0f0f0'; this.style.transform='translateX(0)'">
+                <i class="fa-solid fa-pen-nib" style="font-size: 18px;"></i>
+                <span>Draft Sales Pitch</span>
+            </button>
+            
+            <button onclick="navigateTo('/poster')" style="padding: 15px; background: #f0f0f0; color: #333; border: none; border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: 500; text-align: left; display: flex; align-items: center; gap: 12px; transition: all 0.3s ease;" onmouseover="this.style.background='#e0e0e0'; this.style.transform='translateX(5px)'" onmouseout="this.style.background='#f0f0f0'; this.style.transform='translateX(0)'">
+                <i class="fa-solid fa-images" style="font-size: 18px;"></i>
+                <span>Generate Poster Prompt</span>
+            </button>
+            
+            <button onclick="navigateTo('/lead-scorer')" style="padding: 15px; background: #f0f0f0; color: #333; border: none; border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: 500; text-align: left; display: flex; align-items: center; gap: 12px; transition: all 0.3s ease;" onmouseover="this.style.background='#e0e0e0'; this.style.transform='translateX(5px)'" onmouseout="this.style.background='#f0f0f0'; this.style.transform='translateX(0)'">
+                <i class="fa-solid fa-user-check" style="font-size: 18px;"></i>
+                <span>Score Leads</span>
+            </button>
+            
+            <button onclick="navigateTo('/competitor')" style="padding: 15px; background: #f0f0f0; color: #333; border: none; border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: 500; text-align: left; display: flex; align-items: center; gap: 12px; transition: all 0.3s ease;" onmouseover="this.style.background='#e0e0e0'; this.style.transform='translateX(5px)'" onmouseout="this.style.background='#f0f0f0'; this.style.transform='translateX(0)'">
+                <i class="fa-solid fa-chart-line" style="font-size: 18px;"></i>
+                <span>Analyze Competitors</span>
+            </button>
+        </div>
+        
+        <button onclick="closeInterestModal()" style="margin-top: 20px; width: 100%; padding: 12px; background: none; border: 1px solid #ddd; border-radius: 6px; cursor: pointer; color: #666; font-weight: 500; transition: all 0.3s ease;" onmouseover="this.style.borderColor='#ff6b6b'; this.style.color='#ff6b6b'" onmouseout="this.style.borderColor='#ddd'; this.style.color='#666'">
+            Close
+        </button>
+    </div>
+</div>
+
+<style>
+#interestModal {
+    display: none !important;
+}
+
+#interestModal.show {
+    display: flex !important;
+}
+</style>
+
+<!-- Marketing Consultant Chatbot Widget -->
+<div id="chatbot" style="position: fixed; bottom: 20px; right: 20px;">
+    <!-- Circular FAB Button -->
+    <button id="chatbot-fab" style="
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #ff6b6b, #ff5252);
+        border: none;
+        color: white;
+        font-size: 28px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
+        transition: all 0.3s ease;
+        z-index: 999;
+    " onmouseover="this.style.transform='scale(1.1)';this.style.boxShadow='0 6px 16px rgba(255, 107, 107, 0.6)';" onmouseout="this.style.transform='scale(1)';this.style.boxShadow='0 4px 12px rgba(255, 107, 107, 0.4)';">
+        <i class="fa-solid fa-robot" style="animation:pulse 2s infinite;"></i>
+    </button>
+    
+    <!-- Chat Window -->
+    <div id="chatbot-body" style="
+        position: absolute;
+        bottom: 80px;
+        right: 0;
+        width: 350px;
+        display: none;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 5px 30px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+        flex-direction: column;
+        max-height: 450px;
+        z-index: 998;
+    ">
+        <div style="background:linear-gradient(135deg, #ff6b6b, #ff5252);color:#fff;padding:15px;display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-weight:bold;font-size:16px;">MarketAI Assistant</span>
+            <button id="chatbot-close" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;">×</button>
+        </div>
+        <div id="chatbot-messages" style="flex:1;overflow-y:auto;padding:12px;font-size:14px;max-height:350px;"></div>
+        <input type="text" id="chatbot-input" placeholder="Ask marketing advice..." style="
+            width:100%;
+            padding:10px;
+            border:1px solid #ddd;
+            border-top:1px solid #e0e0e0;
+            box-sizing:border-box;
+            font-size:14px;
+        " />
+    </div>
+</div>
+
+<style>
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(0.95); }
+}
+</style>
+
+<script>
+document.getElementById('chatbot-close').addEventListener('click', function(e) {
+    e.stopPropagation();
+    document.getElementById('chatbot-body').style.display = 'none';
+});
+
+function appendMessage(text, from) {
+    var container = document.getElementById('chatbot-messages');
+    var msg = document.createElement('div');
+    msg.style.margin='8px 0';
+    msg.style.color='black';
+    msg.style.lineHeight='1.4';
+    msg.textContent = text;
+    if(from==='user') {
+        msg.style.fontWeight='bold';
+        msg.style.textAlign='right';
+        msg.style.color='#ff6b6b';
+    } else {
+        msg.style.backgroundColor='#f5f5f5';
+        msg.style.padding='8px';
+        msg.style.borderRadius='6px';
+    }
+    container.appendChild(msg);
+    container.scrollTop = container.scrollHeight;
+}
+
+document.getElementById('chatbot-close').addEventListener('click', function(e) {
+    e.stopPropagation();
+    document.getElementById('chatbot-body').style.display = 'none';
+});
+
+// Modal functions
+function openInterestModal() {
+    document.getElementById('interestModal').classList.add('show');
+}
+
+function closeInterestModal() {
+    document.getElementById('interestModal').classList.remove('show');
+}
+
+function navigateTo(url) {
+    window.location.href = url;
+}
+
+// Close modal if user clicks outside it
+window.addEventListener('click', function(event) {
+    var modal = document.getElementById('interestModal');
+    if (event.target === modal) {
+        modal.classList.remove('show');
+    }
+});
+
+// Track if chatbot FAQ has been shown
+var faqShown = false;
+
+document.getElementById('chatbot-fab').addEventListener('click', function() {
+    var body = document.getElementById('chatbot-body');
+    var isVisible = body.style.display !== 'none';
+    
+    if (!isVisible) {
+        body.style.display = 'flex';
+        // Show FAQ suggestions on first open
+        if (!faqShown) {
+            setTimeout(function() {
+                appendMessage('Hi! 👋 I can help with marketing questions. Try asking:', 'bot');
+                
+                var faqSuggestions = [
+                    '• How can I improve my campaign?',
+                    '• What are key metrics to track?',
+                    '• How do I identify my target audience?',
+                    '• What makes a good sales pitch?',
+                    '• How do I score and prioritize leads?',
+                    '• What should I consider about competitors?'
+                ];
+                
+                faqSuggestions.forEach(function(faq) {
+                    appendMessage(faq, 'bot');
+                });
+                
+                faqShown = true;
+            }, 300);
+        }
+    } else {
+        body.style.display = 'none';
+    }
+});
+</script>
+{% endblock %}

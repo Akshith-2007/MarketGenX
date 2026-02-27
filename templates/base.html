@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MarketAI - Smart Marketing Automation</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <!-- Background Animated Blobs -->
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+
+    <nav class="navbar">
+        <a href="/" class="logo" style="text-decoration: none;">
+            <i class="fa-solid fa-bolt"></i> MarketAI
+        </a>
+        <div class="nav-links">
+            <a href="/" class="{% if request.path == '/' %}active{% endif %}">Home</a>
+            <a href="/campaign" class="{% if request.path == '/campaign' %}active{% endif %}">Campaigns</a>
+            <a href="/pitch" class="{% if request.path == '/pitch' %}active{% endif %}">Sales Pitches</a>
+            <a href="/lead-scorer" class="{% if request.path == '/lead-scorer' %}active{% endif %}">Lead Scorer</a>
+            <a href="/competitor" class="{% if request.path == '/competitor' %}active{% endif %}">Competitor Analysis</a>
+            <a href="/poster" class="{% if request.path == '/poster' %}active{% endif %}">Poster Generator</a>
+        </div>
+    </nav>
+
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+</body>
+
+</html>

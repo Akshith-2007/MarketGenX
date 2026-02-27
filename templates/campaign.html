@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="app-layout fade-in">
+    <div class="form-section glass-panel">
+        <h2><i class="fa-solid fa-bullhorn text-accent"></i> Create Campaign</h2>
+        <p class="subtitle">Enter your details and let MarketAI do the heavy lifting.</p>
+
+        <form method="POST" action="/campaign">
+            <div class="form-group">
+                <label for="product">Product or Service</label>
+                <input type="text" id="product" name="product" placeholder="e.g. NextGen CRM Tool" required>
+            </div>
+
+            <div class="form-group">
+                <label for="audience">Target Audience</label>
+                <input type="text" id="audience" name="audience" placeholder="e.g. Small business owners in retail"
+                    required>
+            </div>
+
+            <div class="form-group">
+                <label for="goal">Primary Goal</label>
+                <select id="goal" name="goal" required>
+                    <option value="Brand Awareness">Brand Awareness</option>
+                    <option value="Lead Generation">Lead Generation</option>
+                    <option value="User Acquisition">User Acquisition</option>
+                    <option value="Sales Conversion">Sales Conversion</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="team_members">Number of Team Members</label>
+                <input type="number" id="team_members" name="team_members" placeholder="e.g. 5" min="1" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Campaign
+            </button>
+        </form>
+    </div>
+
+    <div class="result-section glass-panel">
+        <h3>Generated Campaign</h3>
+        {% if result %}
+        <div class="result-content markdown-body">
+            {{ result | format_campaign | safe }}
+        </div>
+        
+        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255, 107, 107, 0.3);">
+            <button type="button" class="btn btn-primary" onclick="generatePoster()" id="posterBtn">
+                <i class="fa-solid fa-images"></i> Generate Poster
+            </button>
+        </div>
+        
+        <div id="posterResult" style="margin-top: 20px; display: none;">
+            <h3 style="color: #ff6b6b;">Generated Poster Concept</h3>
+            <div class="result-content markdown-body" id="posterContent">
+            </div>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fa-solid fa-pen-fancy"></i>
+            <p>Your generated marketing campaign will appear here.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function generatePoster() {
+    const campaignContent = document.querySelector('.result-content').innerText;
+    const posterBtn = document.getElementById('posterBtn');
+    
+    posterBtn.disabled = true;
+    posterBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generating...';
+    
+    fetch('/generate-poster', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            campaign_content: campaignContent
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('posterContent').innerText = data.poster;
+        document.getElementById('posterResult').style.display = 'block';
+        posterBtn.disabled = false;
+        posterBtn.innerHTML = '<i class="fa-solid fa-images"></i> Generate Poster';
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        posterBtn.disabled = false;
+        posterBtn.innerHTML = '<i class="fa-solid fa-images"></i> Generate Poster';
+        alert('Error generating poster. Please try again.');
+    });
+}
+</script>
+{% endblock %}

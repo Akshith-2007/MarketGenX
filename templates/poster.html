@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="app-layout fade-in">
+    <div class="form-section glass-panel">
+        <h2><i class="fa-solid fa-wand-magic-sparkles text-accent"></i> Guided Poster Prompt Builder</h2>
+        <p class="subtitle">Answer these questions and we'll generate a perfect AI prompt for your poster.</p>
+
+        <form method="POST" action="/poster">
+            <div class="form-group">
+                <label for="product_name">Product / Service Name</label>
+                <input type="text" id="product_name" name="product_name" placeholder="e.g. NextGen CRM" required>
+            </div>
+            <div class="form-group">
+                <label for="audience">Target Audience</label>
+                <input type="text" id="audience" name="audience" placeholder="e.g. Small business owners, startups" required>
+            </div>
+            <div class="form-group">
+                <label for="goal">Marketing Goal</label>
+                <input type="text" id="goal" name="goal" placeholder="e.g. Increase brand awareness, drive sales" required>
+            </div>
+            <div class="form-group">
+                <label for="key_message">Key Message / USP</label>
+                <input type="text" id="key_message" name="key_message" placeholder="e.g. Save 50% time on tasks" required>
+            </div>
+            <div class="form-group">
+                <label for="tone">Poster Tone</label>
+                <select id="tone" name="tone" required>
+                    <option value="Professional">Professional & Formal</option>
+                    <option value="Casual">Casual & Friendly</option>
+                    <option value="Bold">Bold & Aggressive</option>
+                    <option value="Inspirational">Inspirational & Motivational</option>
+                    <option value="Humorous">Humorous & Fun</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="style">Visual Style</label>
+                <select id="style" name="style" required>
+                    <option value="Modern Minimalist">Modern & Minimalist</option>
+                    <option value="Bold & Eye-catching">Bold & Eye-catching</option>
+                    <option value="Professional Corporate">Professional & Corporate</option>
+                    <option value="Creative Artistic">Creative & Artistic</option>
+                    <option value="Trendy Social Media">Trendy & Social Media</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="color_preference">Color Preference</label>
+                <input type="text" id="color_preference" name="color_preference" placeholder="e.g. Blue and white, vibrant neons" required>
+            </div>
+            <div class="form-group">
+                <label for="additional_elements">Additional Elements (optional)</label>
+                <textarea id="additional_elements" name="additional_elements" placeholder="Special features to include, logos, specific imagery ideas..." rows="3"></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="fa-solid fa-sparkles"></i> Generate Prompt
+            </button>
+        </form>
+    </div>
+
+    <div class="result-section glass-panel">
+        <h3>Your AI Prompt for Poster Generation</h3>
+        {% if result %}
+        <div class="result-content markdown-body" id="promptText" style="background:#f8f9fa;padding:15px;border-radius:8px;border-left:4px solid #ff6b6b;">
+            {{ result | replace('\n', '<br>') | safe }}
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
+            <button type="button" class="btn btn-secondary" onclick="copyPrompt()">
+                <i class="fa-solid fa-copy"></i> Copy Prompt
+            </button>
+            <button type="button" class="btn btn-primary" onclick="generatePosterWithAI()">
+                <i class="fa-solid fa-image"></i> Generate Poster
+            </button>
+        </div>
+        <p style="margin-top:10px;font-size:14px;color:#666;">Click "Generate Poster" to create the actual poster image using AI, or copy the prompt to use with your preferred image generator.</p>
+        
+        <!-- Poster Image Display -->
+        <div id="posterImageContainer" style="margin-top: 20px; display: none;">
+            <h4 style="color: #ff6b6b; margin-bottom: 15px;">Generated Poster</h4>
+            <img id="posterImage" src="" alt="Generated Poster" style="max-width: 100%; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); margin-bottom: 15px;">
+            <div style="display: flex; gap: 10px;">
+                <button type="button" class="btn btn-primary" onclick="downloadPoster()">
+                    <i class="fa-solid fa-download"></i> Download Poster
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="hidePosterImage()">
+                    <i class="fa-solid fa-times"></i> Close
+                </button>
+            </div>
+        </div>
+        
+        <div id="posterLoadingContainer" style="margin-top: 20px; display: none; text-align: center;">
+            <i class="fa-solid fa-spinner fa-spin" style="font-size: 32px; color: #ff6b6b; margin-bottom: 10px;"></i>
+            <p>Generating your poster... This may take a moment.</p>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fa-solid fa-lightbulb"></i>
+            <p>Your custom prompt will appear here for you to copy and use.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function copyPrompt() {
+    const promptText = document.getElementById('promptText').innerText;
+    navigator.clipboard.writeText(promptText).then(() => {
+        alert('Prompt copied to clipboard!');
+    }).catch(err => {
+        alert('Failed to copy prompt.');
+    });
+}
+
+function generatePosterWithAI() {
+    const promptText = document.getElementById('promptText').innerText;
+    
+    if (!promptText) {
+        alert('Please generate a prompt first.');
+        return;
+    }
+    
+    // Show loading indicator
+    document.getElementById('posterLoadingContainer').style.display = 'block';
+    document.getElementById('posterImageContainer').style.display = 'none';
+    
+    // Call the backend API to generate the image
+    fetch('/generate-poster-image', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ prompt: promptText })
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('posterLoadingContainer').style.display = 'none';
+        
+        if (data.error) {
+            alert('Error generating poster: ' + data.error);
+            return;
+        }
+        
+        // Display the generated image
+        document.getElementById('posterImage').src = data.image_url;
+        document.getElementById('posterImageContainer').style.display = 'block';
+    })
+    .catch(error => {
+        document.getElementById('posterLoadingContainer').style.display = 'none';
+        alert('Error: ' + error.message);
+    });
+}
+
+function downloadPoster() {
+    const imageUrl = document.getElementById('posterImage').src;
+    
+    if (!imageUrl) {
+        alert('No image to download.');
+        return;
+    }
+    
+    // Create a link element and trigger download
+    const link = document.createElement('a');
+    link.href = imageUrl;
+    link.download = 'marketai-poster.png';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+function hidePosterImage() {
+    document.getElementById('posterImageContainer').style.display = 'none';
+}
+</script>
+{% endblock %}
